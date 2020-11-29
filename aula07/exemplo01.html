@@ -127,7 +127,7 @@
                         objetos[i].position.x = objetos_initial_position[i].x + Math.cos(angle);
                     }    
                 }          
-                angle+=0.1;
+                angle+=0.09;
                 
                 if(count >= 50 && objetos.length > 0){
                     var number = Math.round(Math.random() * 10);
@@ -223,7 +223,10 @@
         }
         
         function create_sphere(i, sphere_position) {
-            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 10 }, scene);
+            //var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 10 }, scene);
+            var sphere = new BABYLON.MeshBuilder.CreateCapsule("capsule", {radius:0.5, capSubdivisions: 6, subdivisions:6, tessellation:36, height:2});
+            sphere.material = new BABYLON.StandardMaterial("capsuleMat", scene);
+            sphere.material.diffuseTexture = new BABYLON.Texture("textures/pokemon2.png", scene);
             sphere.position = sphere_position;
             sphere.name = "object" + i;
             if(holes_initial_positions.length < 8)
