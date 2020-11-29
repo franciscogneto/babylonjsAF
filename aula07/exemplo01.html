@@ -129,7 +129,7 @@
                 }          
                 angle+=0.1;
                 
-                if(count >= 25 && objetos.length > 0){
+                if(count >= 50 && objetos.length > 0){
                     var number = Math.round(Math.random() * 10);
                     while(number > 7)
                         number = Math.round(Math.random() * 10);
@@ -173,7 +173,6 @@
                     if (aux.name != 'ground' && aux.name != 'polygon') {
                         if(aux.position.y == 0)
                             aux.position.y -= 0.5;
-
                         /*var qtd_true = 0;
                         objetos.forEach(element => {
                             if (element.position.y != 0)
@@ -243,7 +242,11 @@
             console.log(holes.length);
             polygon = BABYLON.MeshBuilder.ExtrudePolygon("polygon",
                 { shape: shape, holes: holes, depth: 1, sideOrientation: BABYLON.Mesh.DOUBLESIDE }, scene);
-        }
+            polygon.material = new BABYLON.StandardMaterial("polygontMat", scene);
+            polygon.material.diffuseTexture = new BABYLON.Texture("textures/glauquera3.jpeg", scene);
+            //polygon.material.diffuseTexture.hasAlpha = true;
+            //polygon.scaling.y = 0.1;
+            }
 
         function create_objects() {
 
