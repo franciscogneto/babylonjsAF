@@ -51,6 +51,7 @@
         var scene = null;
         var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
         var objetos = [];
+        var objetos_initial_position = [];
         var holes_initial_positions = [];
         
         const holes = [];
@@ -94,7 +95,7 @@
                 if (i === -1) {
                     window.clearInterval(handle);
                     create_objects();
-                    create_table();
+                    //create_table();
                     textBlock.dispose();
                     advancedTexture.dispose();
                 }
@@ -108,9 +109,8 @@
             objetos.forEach(element => {
                 element.dispose();
             });
-            for (var i = 0; i < 6; i++) {
-                var obj = objetos.pop(); console.log(obj.name);
-            }
+            objetos = [];
+            objetos_initial_position = [];
         }
 
         function create_environment() {
@@ -127,19 +127,34 @@
                 if(angle >= 360){
                     angle = 0;
                 } 
-                if(polygon){
+                /*if(polygon){
                     polygon.dispose();
-                }
-                for(var i = 0; i < holes.length; i++){
+                }*/
+                /*for(var i = 0; i < holes.length; i++){
                     var aux = holes[i];
                     var aux2 = holes_initial_positions[i];
                     for(var j = 0; j < aux.length; j++){
                         aux[j].x = aux2[j].x + Math.cos(angle);
+                        console.log(aux[j].x);
                     }
+                }*/
+                for(var i = 0; i < objetos.length; i++){
+                    if(objetos[i].position.y == 0){
+                        objetos[i].position.x = objetos_initial_position[i].x + Math.cos(angle);
+                        //objetos[i].position.x += 0.001;
+                        //console.log('1: '+objetos[i].position.x);
+                        //console.log('2: '+objetos_initial_position[i].x);
+                    }    
                 }
+                console.log('objetos: '+objetos.length);
+                console.log('initial position: '+objetos_initial_position.length);
+                /*for(var i = 0; i < objetos_initial_position.length ; i++){
+                    //console.log('opaaaa');
+                    console.log('aa: '+objetos_initial_position[i].x);
+                }*/
                 
-                angle+=0.001;
-                create_table();
+                angle+=0.01;
+                //create_table();
                 scene.render();
             };
             engine.runRenderLoop(renderLoop);
@@ -168,15 +183,15 @@
         function managerEvents() {
             scene.onPointerDown = function (evt, pickResult) {
                 if (pickResult.hit) {
-                    console.log(pickResult.pickedPoint.x);
-                    console.log(pickResult.pickedPoint.z);
+                    //console.log(pickResult.pickedPoint.x);
+                    //console.log(pickResult.pickedPoint.z);
                     var aux = scene.getMeshByName(pickResult.pickedMesh.name);
                     if (aux.name != 'ground' && aux.name != 'polygon') {
                         aux.position.y -= 0.5;
 
                         var qtd_true = 0;
                         objetos.forEach(element => {
-                            console.log(objetos.length);
+                            //console.log(objetos.length);
                             if (element.position.y != 0)
                                 qtd_true++;
                         });
@@ -205,9 +220,10 @@
             var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 10 }, scene);
             sphere.position = sphere_position;
             sphere.name = "object" + i;
-            objetos.push(sphere);
+            
             holes_initial_positions.push(create_circle(0.85, sphere.position.x, sphere.position.z));
             holes.push(create_circle(0.85, sphere.position.x, sphere.position.z)); 
+            objetos_initial_position.push(new BABYLON.Vector3(sphere.position.x,sphere.position.y,sphere.position.z));
             return sphere
         }
         function create_table() {
@@ -244,6 +260,9 @@
             objetos.push(create_sphere("7", new BABYLON.Vector3(0, 0, -4), 0, -4));
 
             objetos.push(create_sphere("8", new BABYLON.Vector3(-2.5, 0, -4), -2.5, -4));
+            /*console.log('111');
+            console.log(objetos.length);
+            console.log(objetos_initial_position.length);*/
 
 
 
