@@ -51,47 +51,69 @@
         var scene = null;
         var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
         var objetos = [];
-
+        var holes_initial_positions = [];
+        
+        const holes = [];
+        var polygon;
         var createScene = function () {
             scene = new BABYLON.Scene(engine);
             create_environment();
             start();
             managerEvents();
-            
+            animation();
+            angle = 0;
+            /*scene.onBeforeRenderObservable.add(() => {
+
+                if (polygon) {
+                    polygon.dispose();
+                }
+                for (var j = 0; j < holes.length; j++) {
+                    var lenght = holes[j].lenght;
+                    var aux = holes[j];
+                    for(var i = 0; i < lenght; i++){
+                        console.log(typeof(holes));
+                    }
+                        
+                    
+                }
+                console.log('..');
+                angle += 0.1;
+                create_table();
+            })*/
             return scene;
         }
 
-        function start(){
-            var i = 5;
-            var textBlock = new BABYLON.GUI.TextBlock("text", new String(i)); 
+        function start() {
+            var i = 1;
+            var textBlock = new BABYLON.GUI.TextBlock("text", new String(i));
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
             advancedTexture.addControl(textBlock);
             var handle = window.setInterval(() => {
                 i--;
                 textBlock.text = new String(i);
-                if(i === -1){
+                if (i === -1) {
                     window.clearInterval(handle);
                     create_objects();
-                    
+                    create_table();
                     textBlock.dispose();
                     advancedTexture.dispose();
                 }
-                if (i === 0 ){
+                if (i === 0) {
                     textBlock.text = "Começar!!!!";
                 }
-            },1000);
+            }, 1000);
         }
 
-        function removeAll(){
-            objetos.forEach(element =>{
+        function removeAll() {
+            objetos.forEach(element => {
                 element.dispose();
             });
-            for(var i = 0; i < 6; i++){
-                var obj =  objetos.pop(); console.log(obj.name);
+            for (var i = 0; i < 6; i++) {
+                var obj = objetos.pop(); console.log(obj.name);
             }
         }
 
-        function create_environment(){
+        function create_environment() {
             var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
             camera.setTarget(BABYLON.Vector3.Zero());
             camera.attachControl(canvas, true);
@@ -100,27 +122,46 @@
         }
 
         function animation() {
-            
+            var angle = 0;
+            var renderLoop = function () {
+                if(angle >= 360){
+                    angle = 0;
+                } 
+                if(polygon){
+                    polygon.dispose();
+                }
+                for(var i = 0; i < holes.length; i++){
+                    var aux = holes[i];
+                    var aux2 = holes_initial_positions[i];
+                    for(var j = 0; j < aux.length; j++){
+                        aux[j].x = aux2[j].x + Math.cos(angle);
+                    }
+                }
+                
+                angle+=0.001;
+                create_table();
+                scene.render();
+            };
             engine.runRenderLoop(renderLoop);
         }
 
-        function reset(){
+        function reset() {
             removeAll();
-            var textBlock = new BABYLON.GUI.TextBlock("text", "Finalizado!"); 
+            var textBlock = new BABYLON.GUI.TextBlock("text", "Finalizado!");
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
             advancedTexture.addControl(textBlock);
-            var  i = 2;
+            var i = 2;
             var handle = window.setInterval(() => {
-                
+
                 i--;
-                if(i === 0){
+                if (i === 0) {
                     window.clearInterval(handle);
                     textBlock.dispose();
                     advancedTexture.dispose();
                     create_objects();
                 }
 
-            },1000);
+            }, 1000);
 
         }
 
@@ -130,79 +171,87 @@
                     console.log(pickResult.pickedPoint.x);
                     console.log(pickResult.pickedPoint.z);
                     var aux = scene.getMeshByName(pickResult.pickedMesh.name);
-                    if(aux.name != 'ground'){
+                    if (aux.name != 'ground' && aux.name != 'polygon') {
                         aux.position.y -= 0.5;
 
                         var qtd_true = 0;
-                        objetos.forEach(element =>{
+                        objetos.forEach(element => {
                             console.log(objetos.length);
-                            if(element.position.y != 0)
+                            if (element.position.y != 0)
                                 qtd_true++;
                         });
-                        if(qtd_true == 6){
+                        if (qtd_true == objetos.length) {
                             reset();
                         }
                     }
                 }
             };
         }
-        function create_circle(raio){
-                var x = 0, z = 0;
-                var incAngle = 2 * Math.PI / 60;
-                var angle = 0;
-                var theta = 0;
-                var path = [];
-                for (var j = 0; j < qtd_eletrons; j++) {
-                    x = Math.cos(angle) * raio;
-                    z = Math.sin(angle) * raio;
-                    path.push(new BABYLON.Vector3(x,0,z));
-                    angle += incAngle;
-                }
-                return path;
+        function create_circle(raio, xx, zz) {
+            var x = 0, z = 0;
+            var incAngle = 2 * Math.PI / 60;
+            var angle = 0;
+            var theta = 0;
+            var path = [];
+            for (var j = 0; j < 360; j++) {
+                x = Math.cos(angle) * raio;
+                z = Math.sin(angle) * raio;
+                path.push(new BABYLON.Vector3(x + xx, 0, z + zz));
+                angle += incAngle;
+            }
+            return path;
         }
-        function create_objects(){
+        function create_sphere(i, sphere_position, x_hole, z_hole) {
+            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 10 }, scene);
+            sphere.position = sphere_position;
+            sphere.name = "object" + i;
+            objetos.push(sphere);
+            holes_initial_positions.push(create_circle(0.85, sphere.position.x, sphere.position.z));
+            holes.push(create_circle(0.85, sphere.position.x, sphere.position.z)); 
+            return sphere
+        }
+        function create_table() {
+            var shape = [
+                new BABYLON.Vector3(-5, 0, -5),
+                new BABYLON.Vector3(5, 0, -5),
+                new BABYLON.Vector3(5, 0, 5),
+                new BABYLON.Vector3(-5, 0, 5)
+            ];
+            polygon = BABYLON.MeshBuilder.ExtrudePolygon("polygon",
+                { shape: shape, holes: holes, depth: 1, sideOrientation: BABYLON.Mesh.DOUBLESIDE }, scene);
 
-        /*   var shape = [
-            new BABYLON.Vector3(-6, 0, -6),
-            new BABYLON.Vector3(6, 0, -6),
-            new BABYLON.Vector3(6, 0, 6),
-            new BABYLON.Vector3(-6, 0, 6)
-        ];    
-        const holes = [create_circle(2)];
-        var polygon = BABYLON.MeshBuilder.ExtrudePolygon("polygon",
-        { shape: shape, holes: holes, depth: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE }, scene);
-        */
-        var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
-        var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 1, segments: 10}, scene);
-        //sphere.visibility = 0.5;
-        sphere.name = "object0";
-        objetos.push(sphere);
-        sphere.position.y = 0;
-        sphere.position.x = -2.5;
-        sphere.position.z = -1.5;
-        var aux = sphere.clone();
-        aux.name = "object1";
-        objetos.push(aux);
-        aux.position.x=0;
-        aux = aux.clone();
-        aux.name = "object2";
-        objetos.push(aux);
-        aux.position.x = 2.5;
-        aux = aux.clone();
-        aux.name = "object3";
-        aux.position.z = 1.5;
-        objetos.push(aux);
-        aux = aux.clone();
-        aux.name = "object4";
-        aux.position.x=0;
-        objetos.push(aux);
-        aux = aux.clone();
-        aux.name = "object5";
-        aux.position.x = -2.5;
-        objetos.push(aux);
-    }
+        }
 
-        
+        function create_objects() {
+
+
+
+            objetos.push(create_sphere("0", new BABYLON.Vector3(-1.5, 0, -1.5), -1.5, -1.5));
+
+            objetos.push(create_sphere("1", new BABYLON.Vector3(1.5, 0, -1.5), 1.5, -1.5));
+
+            //objetos.push(create_sphere("2",new BABYLON.Vector3(2.5,0,-1.5),2.5,-1.5));
+
+            objetos.push(create_sphere("3", new BABYLON.Vector3(2.5, 0, 1.5), 2.5, 1.5));
+
+            objetos.push(create_sphere("4", new BABYLON.Vector3(0, 0, 1.5), 0, 1.5));
+
+            objetos.push(create_sphere("5", new BABYLON.Vector3(-2.5, 0, 1.5), -2.5, 1.5));
+
+
+            objetos.push(create_sphere("6", new BABYLON.Vector3(2.5, 0, -4), 2.5, -4));
+
+            objetos.push(create_sphere("7", new BABYLON.Vector3(0, 0, -4), 0, -4));
+
+            objetos.push(create_sphere("8", new BABYLON.Vector3(-2.5, 0, -4), -2.5, -4));
+
+
+
+
+
+        }
+
+
 
         engine = createDefaultEngine();
         if (!engine) throw 'engine should not be null.';
