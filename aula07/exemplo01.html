@@ -228,7 +228,12 @@
             //var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 10 }, scene);
             var sphere = new BABYLON.MeshBuilder.CreateCapsule("capsule", {radius:0.5, capSubdivisions: 6, subdivisions:6, tessellation:36, height:2});
             sphere.material = new BABYLON.StandardMaterial("capsuleMat", scene);
-            sphere.material.diffuseTexture = new BABYLON.Texture("textures/pokemon2.png", scene);
+            
+            sphere.material.diffuseTexture = new BABYLON.Texture("textures/download.jpg", scene);
+            //sphere.material.diffuseTexture = new BABYLON.Texture("textures/pokemon2.png", scene);
+            //sphere.material.diffuseTexture = new BABYLON.Texture("textures/terror.jpg", scene);
+            //sphere.material.diffuseTexture = new BABYLON.Texture("textures/terror2.jpg", scene);
+            
             sphere.position = sphere_position;
             sphere.name = "object" + i;
             if(holes_initial_positions.length < 8)
