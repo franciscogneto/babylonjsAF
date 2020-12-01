@@ -124,7 +124,10 @@
                 //movimentos do objeto
                 for(var i = 0; i < objetos.length; i++){
                     if(objetos[i].position.y == 0){
-                        objetos[i].position.x = objetos_initial_position[i].x + Math.cos(angle);
+                        if(i%2 == 0)
+                            objetos[i].position.x = objetos_initial_position[i].x + Math.cos(angle);
+                        else
+                            objetos[i].position.x = objetos_initial_position[i].x - Math.cos(angle);
                     }    
                 }          
                 angle+=0.09;
@@ -133,7 +136,6 @@
                     var number = Math.round(Math.random() * 10);
                     while(number > 7)
                         number = Math.round(Math.random() * 10);
-                    //var obj = objetos[number];
                     if(objetos[number].position.y == 0)
                          objetos[number].position.y -= 0.5;
                     else
@@ -247,8 +249,6 @@
                 { shape: shape, holes: holes, depth: 1, sideOrientation: BABYLON.Mesh.DOUBLESIDE }, scene);
             polygon.material = new BABYLON.StandardMaterial("polygontMat", scene);
             polygon.material.diffuseTexture = new BABYLON.Texture("textures/glauquera4.jpg", scene);
-            //polygon.material.diffuseTexture.hasAlpha = true;
-            //polygon.scaling.y = 0.1;
             }
 
         function create_objects() {
@@ -259,14 +259,11 @@
 
             objetos.push(create_sphere("1", new BABYLON.Vector3(1.75, 0, -1.5)));
 
-            //objetos.push(create_sphere("2",new BABYLON.Vector3(2.5,0,-1.5),2.5,-1.5));
-
             objetos.push(create_sphere("3", new BABYLON.Vector3(3.5, 0, 1.5)));
 
             objetos.push(create_sphere("4", new BABYLON.Vector3(0, 0, 1.5)));
 
             objetos.push(create_sphere("5", new BABYLON.Vector3(-3.5, 0, 1.5)));
-
 
             objetos.push(create_sphere("6", new BABYLON.Vector3(3.5, 0, -4)));
 
