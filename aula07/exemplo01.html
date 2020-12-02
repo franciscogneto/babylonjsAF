@@ -112,6 +112,15 @@
             camera.attachControl(canvas, true);
             var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
             light.intensity = 0.7;
+            // Skybox
+        var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:75.0}, scene);
+        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("http://www.babylonjs-playground.com/textures/skybox2", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        skybox.material = skyboxMaterial;
         }
 
         function animation() {
@@ -149,6 +158,19 @@
             engine.runRenderLoop(renderLoop);
         }
 
+
+        function check(){
+            var up = 0;
+            var down = 0;
+            objetos.forEach(element =>{
+                element.position.y == 0 ? up++: down++;
+            });
+            if(up <= 3){
+                for(var i = 0; i < objetos.length; i++){
+                    //if();
+                }
+            }
+        }
         function reset() {
             removeAll();
             var textBlock = new BABYLON.GUI.TextBlock("text", "Finalizado!");
@@ -175,14 +197,6 @@
                     if (aux.name != 'ground' && aux.name != 'polygon') {
                         if(aux.position.y == 0)
                             aux.position.y -= 0.5;
-                        /*var qtd_true = 0;
-                        objetos.forEach(element => {
-                            if (element.position.y != 0)
-                                qtd_true++;
-                        });
-                        if (qtd_true == objetos.length) {
-                            reset();
-                        }*/
                     }
                 }
             };
@@ -229,7 +243,7 @@
             var sphere = new BABYLON.MeshBuilder.CreateCapsule("capsule", {radius:0.5, capSubdivisions: 6, subdivisions:6, tessellation:36, height:2});
             sphere.material = new BABYLON.StandardMaterial("capsuleMat", scene);
             
-            sphere.material.diffuseTexture = new BABYLON.Texture("textures/download.jpg", scene);
+            sphere.material.diffuseTexture = new BABYLON.Texture("textures2/download.jpg", scene);
             //sphere.material.diffuseTexture = new BABYLON.Texture("textures/pokemon2.png", scene);
             //sphere.material.diffuseTexture = new BABYLON.Texture("textures/terror.jpg", scene);
             //sphere.material.diffuseTexture = new BABYLON.Texture("textures/terror2.jpg", scene);
@@ -253,7 +267,7 @@
             polygon = BABYLON.MeshBuilder.ExtrudePolygon("polygon",
                 { shape: shape, holes: holes, depth: 1, sideOrientation: BABYLON.Mesh.DOUBLESIDE }, scene);
             polygon.material = new BABYLON.StandardMaterial("polygontMat", scene);
-            polygon.material.diffuseTexture = new BABYLON.Texture("textures/glauquera4.jpg", scene);
+            polygon.material.diffuseTexture = new BABYLON.Texture("textures2/glauquera4.jpg", scene);
             }
 
         function create_objects() {
